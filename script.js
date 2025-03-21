@@ -89,10 +89,28 @@ function redo() {
 function saveDrawing() {
     let fileName = prompt("Enter file name:", "drawing");
     if (fileName) {
+        let format = prompt("Enter format (png, jpg, pdf):", "png").toLowerCase();
+        if (!["png", "jpg", "pdf"].includes(format)) {
+            alert("Invalid format! Defaulting to PNG.");
+            format = "png";
+        }
+
         let link = document.createElement("a");
-        link.download = fileName + ".png";
-        link.href = canvas.toDataURL();
-        link.click();
+        if (format === "pdf") {
+            const pdfScript = document.createElement("script");
+            pdfScript.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+            pdfScript.onload = () => {
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF();
+                pdf.addImage(canvas.toDataURL("image/png"), "PNG", 10, 10, 190, 100);
+                pdf.save(fileName + ".pdf");
+            };
+            document.body.appendChild(pdfScript);
+        } else {
+            link.download = fileName + "." + format;
+            link.href = canvas.toDataURL("image/" + format);
+            link.click();
+        }
     }
 }
 
