@@ -12,6 +12,9 @@ canvas.addEventListener("mousedown", startDrawing);
 canvas.addEventListener("mousemove", draw);
 canvas.addEventListener("mouseup", stopDrawing);
 canvas.addEventListener("mouseout", stopDrawing);
+canvas.addEventListener("touchstart", startDrawing, { passive: false });
+canvas.addEventListener("touchmove", draw, { passive: false });
+canvas.addEventListener("touchend", stopDrawing);
 
 document.getElementById("undo").addEventListener("click", undo);
 document.getElementById("redo").addEventListener("click", redo);
@@ -22,13 +25,16 @@ document.getElementById("brushSize").addEventListener("input", (e) => brushSize 
 
 function getMousePos(event) {
     const rect = canvas.getBoundingClientRect();
+    const clientX = event.clientX || event.touches[0].clientX;
+    const clientY = event.clientY || event.touches[0].clientY;
     return {
-        x: event.clientX - rect.left,
-        y: event.clientY - rect.top
+        x: clientX - rect.left,
+        y: clientY - rect.top
     };
 }
 
 function startDrawing(event) {
+    event.preventDefault();
     drawing = true;
     ctx.beginPath();
     const pos = getMousePos(event);
@@ -37,6 +43,7 @@ function startDrawing(event) {
 }
 
 function draw(event) {
+    event.preventDefault();
     if (!drawing) return;
     const pos = getMousePos(event);
     ctx.strokeStyle = brushColor;
